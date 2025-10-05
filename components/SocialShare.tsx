@@ -14,7 +14,8 @@ export default function SocialShare({ title, url, description }: SocialShareProp
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`,
-    email: `mailto:?subject=${encodedTitle}&body=${encodedDescription}%0A%0A${encodedUrl}`,
+    // email: `mailto:?subject=${encodedTitle}&body=${encodedDescription}%0A%0A${encodedUrl}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`,
   };
 
   return (
@@ -58,12 +59,21 @@ export default function SocialShare({ title, url, description }: SocialShareProp
           Reddit
         </a>
         <a
+          href={shareLinks.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-link share-whatsapp"
+          aria-label="Share on WhatsApp"
+        >
+          WhatsApp
+        </a>
+        {/* <a
           href={shareLinks.email}
           className="share-link share-email"
           aria-label="Share via Email"
         >
           Email
-        </a>
+        </a> */}
       </div>
     </div>
   );
