@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import AnimatedLink from './AnimatedLink';
 
 interface PaginationProps {
   currentPage: number;
@@ -53,9 +53,9 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchQue
     <nav className="pagination">
       <div className="pagination-container">
         {currentPage > 1 && (
-          <Link href={getPageUrl(currentPage - 1)} className="pagination-link pagination-prev">
+          <AnimatedLink href={getPageUrl(currentPage - 1)} className="pagination-link pagination-prev">
             ← Previous
-          </Link>
+          </AnimatedLink>
         )}
         
         <div className="pagination-numbers">
@@ -63,7 +63,7 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchQue
             page === '...' ? (
               <span key={`ellipsis-${index}`} className="pagination-ellipsis">...</span>
             ) : (
-              <Link
+              <AnimatedLink
                 key={page}
                 href={getPageUrl(page as number)}
                 className={`pagination-link pagination-number ${
@@ -71,15 +71,15 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchQue
                 }`}
               >
                 {page}
-              </Link>
+              </AnimatedLink>
             )
           ))}
         </div>
         
         {currentPage < totalPages && (
-          <Link href={getPageUrl(currentPage + 1)} className="pagination-link pagination-next">
+          <AnimatedLink href={getPageUrl(currentPage + 1)} className="pagination-link pagination-next">
             Next →
-          </Link>
+          </AnimatedLink>
         )}
       </div>
     </nav>
