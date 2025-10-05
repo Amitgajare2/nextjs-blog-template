@@ -3,7 +3,7 @@ import SearchBar from '../../components/SearchBar';
 import TagsFilter from '../../components/TagsFilter';
 import Pagination from '../../components/Pagination';
 import { getPaginatedPosts, getAllTags, searchPosts, getPostsByTag } from '../../utils/blog';
-import Link from 'next/link';
+import AnimatedLink from '../../components/AnimatedLink';
 
 interface BlogPageProps {
   searchParams: {
@@ -66,7 +66,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
           <ul className="blog-posts">
             {postsData.posts.map((post) => (
               <li key={post.slug}>
-                <Link href={`/blog/${post.slug}`} className="blog-post-link">
+                <AnimatedLink href={`/blog/${post.slug}`} className="blog-post-link">
                   <div className="blog-post-meta">
                     <span className="blog-post-date">{post.date}</span>
                     {post.readTime && <span>• {post.readTime}</span>}
@@ -84,7 +84,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
                       ))}
                     </div>
                   )}
-                </Link>
+                </AnimatedLink>
               </li>
             ))}
           </ul>
