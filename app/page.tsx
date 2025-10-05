@@ -1,6 +1,6 @@
 import Navigation from '../components/Navigation';
 import { getPostsSummary } from '../utils/blog';
-import Link from 'next/link';
+import AnimatedLink from '../components/AnimatedLink';
 
 export default async function Home() {
   const posts = getPostsSummary().slice(0, 3); // Show only the 3 most recent posts
@@ -18,10 +18,10 @@ export default async function Home() {
           <ul className="blog-posts">
             {posts.map((post) => (
               <li key={post.slug}>
-                <Link href={`/blog/${post.slug}`} className="blog-post-link">
+                <AnimatedLink href={`/blog/${post.slug}`} className="blog-post-link">
                   <span className="blog-post-date">{post.date}</span>
                   <span className="blog-post-title">{post.title}</span>
-                </Link>
+                </AnimatedLink>
               </li>
             ))}
           </ul>
