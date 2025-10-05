@@ -47,6 +47,16 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Page transition helpers */
+.page-transition-enter {
+  opacity: 0.001;
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
+
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -138,9 +148,7 @@ body {
   margin: 0;
 }
 
-.blog-posts li {
-  /* margin-bottom: 20px; */
-}
+
 
 .blog-post-link {
   color: var(--text-primary);
