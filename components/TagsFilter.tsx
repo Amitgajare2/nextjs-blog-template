@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import AnimatedLink from './AnimatedLink';
 
 interface TagsFilterProps {
   tags: string[];
@@ -13,20 +13,20 @@ export default function TagsFilter({ tags, currentTag, baseUrl }: TagsFilterProp
     <div className="tags-filter">
       <h3 className="tags-title">Filter by tags:</h3>
       <div className="tags-container">
-        <Link 
+        <AnimatedLink 
           href={baseUrl} 
           className={`tag ${!currentTag ? 'tag-active' : ''}`}
         >
           All
-        </Link>
+        </AnimatedLink>
         {tags.map((tag) => (
-          <Link
+          <AnimatedLink
             key={tag}
             href={`${baseUrl}?tag=${encodeURIComponent(tag)}`}
             className={`tag ${currentTag === tag ? 'tag-active' : ''}`}
           >
             {tag}
-          </Link>
+          </AnimatedLink>
         ))}
       </div>
     </div>
