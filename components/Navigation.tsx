@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import AnimatedLink from './AnimatedLink';
 import ThemeToggle from './ThemeToggle';
 
 export default function Navigation() {
@@ -8,13 +8,13 @@ export default function Navigation() {
         <div className="nav-content">
           <ul>
             <li>
-              <Link href="/">home</Link>
+              <AnimatedLink href="/">home</AnimatedLink>
             </li>
             <li>
-              <Link href="/blog">blog</Link>
+              <AnimatedLink href="/blog">blog</AnimatedLink>
             </li>
             <li>
-            <Link href="/about">About</Link>
+            <AnimatedLink href="/about">About</AnimatedLink>
             </li>
           </ul>
           <ThemeToggle />
