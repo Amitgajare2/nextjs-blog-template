@@ -1,5 +1,5 @@
 import Navigation from '../components/Navigation';
-import Link from 'next/link';
+import AnimatedLink from '../components/AnimatedLink';
 
 export default function NotFound() {
   return (
@@ -10,12 +10,12 @@ export default function NotFound() {
           <h1 className="title">404 - Page Not Found</h1>
           <p className="subtitle">
             The page you're looking for doesn't exist. 
-            <Link href="/" style={{ color: '#60a5fa', textDecoration: 'none' }}>
+            <AnimatedLink href="/" className="" >
               Return home
-            </Link> or check out the 
-            <Link href="/blog" style={{ color: '#60a5fa', textDecoration: 'none' }}>
+            </AnimatedLink> or check out the 
+            <AnimatedLink href="/blog" className="" >
               blog
-            </Link>.
+            </AnimatedLink>.
           </p>
         </div>
       </main>
