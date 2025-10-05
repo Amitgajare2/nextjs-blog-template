@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef } from "react";
-import { gsap } from "gsap";
+// Lazy-load GSAP on the client only to keep it out of the SSR/initial bundle
+let gsapRef: typeof import("gsap")["gsap"] | null = null;
 
 interface PageTransitionProps {
 	children: React.ReactNode;
@@ -21,23 +22,26 @@ export default function PageTransition({ children }: PageTransitionProps) {
 	useLayoutEffect(() => {
 		if (!overlayRef.current || !contentRef.current) return;
 
-		const startCover = (_e?: Event) => {
+    const startCover = async (_e?: Event) => {
 			if (!overlayRef.current) return;
 			if (preNavAnimatingRef.current) return;
 			preNavAnimatingRef.current = true;
-			gsap.killTweensOf(overlayRef.current);
-			gsap.set(overlayRef.current, { yPercent: 100, display: "block", pointerEvents: "auto" });
-			gsap.to(overlayRef.current, { yPercent: 0, duration: 0.45, ease: "power3.inOut" });
+        if (!gsapRef) gsapRef = (await import("gsap")).gsap;
+        gsapRef!.killTweensOf(overlayRef.current);
+        gsapRef!.set(overlayRef.current, { yPercent: 100, display: "block", pointerEvents: "auto" });
+        gsapRef!.to(overlayRef.current, { yPercent: 0, duration: 0.45, ease: "power3.inOut" });
 		};
 
 		window.addEventListener("page:cover:start", startCover);
 
-		const ctx = gsap.context(() => {
+    const init = async () => {
+        if (!gsapRef) gsapRef = (await import("gsap")).gsap;
+        const ctx = gsapRef!.context(() => {
 			const overlay = overlayRef.current!;
 			const content = contentRef.current!;
 
 			// Use GPU-accelerated transforms and will-change hints
-			gsap.set([overlay, content], {
+            gsapRef!.set([overlay, content], {
 				force3D: true,
 				willChange: "transform, opacity",
 				transformPerspective: 1000,
@@ -47,16 +51,16 @@ export default function PageTransition({ children }: PageTransitionProps) {
 			// Skip animation on first mount for smooth initial paint
 			if (!hasMountedRef.current) {
 				hasMountedRef.current = true;
-				gsap.set(overlay, { yPercent: 100, display: "none" });
-				gsap.set(content, { autoAlpha: 1, y: 0, filter: "blur(0px)" });
+                gsapRef!.set(overlay, { yPercent: 100, display: "none" });
+                gsapRef!.set(content, { autoAlpha: 1, y: 0, filter: "blur(0px)" });
 				return;
 			}
 
 			const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 			if (prefersReduced) {
 				// Simple crossfade for reduced motion
-				gsap.set(overlay, { display: "none" });
-				gsap.fromTo(
+                gsapRef!.set(overlay, { display: "none" });
+                gsapRef!.fromTo(
 					content,
 					{ autoAlpha: 0 },
 					{ autoAlpha: 1, duration: 0.25, ease: "power1.out" }
@@ -64,7 +68,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 				return;
 			}
 
-			const tl = gsap.timeline({ defaults: { ease: "power4.inOut" } });
+            const tl = gsapRef!.timeline({ defaults: { ease: "power4.inOut" } });
 
 			// Lock scroll while covered
 			const originalOverflow = document.documentElement.style.overflow;
@@ -73,21 +77,21 @@ export default function PageTransition({ children }: PageTransitionProps) {
 			// Cover screen
 			if (!preNavAnimatingRef.current) {
 				// If cover wasn't started by click, start it now (may appear slightly late)
-				tl.set(overlay, { yPercent: 100, display: "block", pointerEvents: "auto" });
-				tl.to(overlay, { yPercent: 0, duration: 0.5 });
+                tl.set(overlay, { yPercent: 100, display: "block", pointerEvents: "auto" });
+                tl.to(overlay, { yPercent: 0, duration: 0.5 });
 			}
 
 			// Swap content while covered
-			tl.set(content, { autoAlpha: 0, y: 10, filter: "blur(6px)" });
+            tl.set(content, { autoAlpha: 0, y: 10, filter: "blur(6px)" });
 
 			// Reveal new page
-			tl.to(overlay, { yPercent: -100, duration: 0.65 });
+            tl.to(overlay, { yPercent: -100, duration: 0.65 });
 			tl.set(overlay, { display: "none", pointerEvents: "none" });
 
 			// Bring in new content as overlay moves away
 			tl.to(
-				content,
-				{ autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" },
+                content,
+                { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" },
 				"<0.15"
 			);
 
@@ -96,11 +100,15 @@ export default function PageTransition({ children }: PageTransitionProps) {
 				preNavAnimatingRef.current = false;
 			});
 		});
+		return ctx;
+    };
 
-        return () => {
-            window.removeEventListener("page:cover:start", startCover);
-            ctx.revert();
-        };
+    let ctxPromise = init();
+
+    return () => {
+        window.removeEventListener("page:cover:start", startCover);
+        ctxPromise.then((ctx) => ctx && ctx.revert()).catch(() => {});
+    };
 	}, [pathname]);
 
 	return (
