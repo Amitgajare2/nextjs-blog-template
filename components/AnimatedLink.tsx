@@ -38,8 +38,8 @@ export default function AnimatedLink({ children, className, onClick, href, ...re
 		}, 50);
 	};
 
-	return (
-		<Link href={href} onClick={handleClick} className={className} {...rest}>
+    return (
+        <Link href={href} onClick={handleClick} className={className} prefetch={false} {...rest}>
 			{children}
 		</Link>
 	);
