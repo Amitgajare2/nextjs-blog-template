@@ -3,8 +3,35 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
+import { visit } from 'unist-util-visit';
 
 const postsDirectory = path.join(process.cwd(), 'blog');
+
+// Plugin to add IDs to headings
+function addHeadingIds() {
+  return (tree: any) => {
+    visit(tree, 'heading', (node: any) => {
+      if (node.children && node.children.length > 0) {
+        const text = node.children
+          .filter((child: any) => child.type === 'text')
+          .map((child: any) => child.value)
+          .join('');
+        
+        // Generate ID from heading text
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+          .trim();
+        
+        node.data = node.data || {};
+        node.data.hProperties = node.data.hProperties || {};
+        node.data.hProperties.id = id;
+      }
+    });
+  };
+}
 
 export interface BlogPost {
   slug: string;
@@ -49,12 +76,17 @@ export function getSortedPostsData(): BlogPost[] {
       // Use gray-matter to parse the post metadata section
       const matterResult = matter(fileContents);
 
+      // Calculate read time if not already provided
+      const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
+
       // Combine the data with the slug
       return {
         slug,
+        contentHtml: '', // Will be populated when needed
+        readTime,
         ...matterResult.data,
         content: matterResult.content,
-      } as Omit<BlogPost, 'contentHtml'>;
+      } as BlogPost;
     });
 
   // Sort posts by date
@@ -83,14 +115,19 @@ export async function getPostData(slug: string): Promise<BlogPost> {
 
     // Use remark to convert markdown into HTML string
     const processedContent = await remark()
+      .use(addHeadingIds)
       .use(html)
       .process(matterResult.content);
     const contentHtml = processedContent.toString();
+
+    // Calculate read time if not already provided
+    const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
 
     // Combine the data with the slug and contentHtml
     return {
       slug,
       contentHtml,
+      readTime,
       ...matterResult.data,
       content: matterResult.content,
     } as BlogPost;
@@ -117,8 +154,12 @@ export function getPostsSummary(): BlogPostSummary[] {
       const fileContents = fs.readFileSync(fullPath, 'utf8');
       const matterResult = matter(fileContents);
 
+      // Calculate read time if not already provided
+      const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
+
       return {
         slug,
+        readTime,
         ...matterResult.data,
       } as BlogPostSummary;
     });
@@ -181,4 +222,33 @@ export function getAllTags(): string[] {
   });
   
   return Array.from(tagSet).sort();
+}
+
+// Calculate reading time based on word count (average 200 words per minute)
+export function calculateReadTime(content: string): string {
+  const wordsPerMinute = 200;
+  const wordCount = content.trim().split(/\s+/).length;
+  const minutes = Math.ceil(wordCount / wordsPerMinute);
+  return `${minutes} min read`;
+}
+
+// Extract headings from HTML content for table of contents
+export function extractHeadings(htmlContent: string): Array<{id: string, text: string, level: number}> {
+  const headingRegex = /<h([1-6])[^>]*id="([^"]*)"[^>]*>(.*?)<\/h[1-6]>/gi;
+  const headings: Array<{id: string, text: string, level: number}> = [];
+  let match;
+
+  while ((match = headingRegex.exec(htmlContent)) !== null) {
+    const level = parseInt(match[1]);
+    const id = match[2];
+    const text = match[3].replace(/<[^>]*>/g, ''); // Remove HTML tags from text
+    
+    headings.push({
+      id,
+      text,
+      level
+    });
+  }
+
+  return headings;
 }
