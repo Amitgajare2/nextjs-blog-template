@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Unfiltered Mind — Next.js Blog Template
+
+Modern, fast, and accessible blog template built with Next.js App Router. Ships with animated page transitions, automatic table of contents, and auto-generated reading time.
+
+## Tech Stack
+- Next.js 15 (App Router)
+- React 19 + TypeScript
+- GSAP 3 (page transition animation, dynamically imported client-side)
+- remark + gray-matter (Markdown to HTML)
+
+## Features
+- Automatic Table of Contents (from post headings)
+- Auto-generated reading time (200 wpm, overridable in frontmatter)
+- GSAP-powered page transition cover with reduced-motion fallback
+- Search, tag filtering, basic pagination
+- Light/Dark theme with persistent toggle
+- Markdown-based content in `blog/`
 
 ## Getting Started
+Prerequisites: Node.js 18+ and npm
 
-First, run the development server:
-
+Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run in development:
+```bash
+npm run dev
+```
+Visit `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Build for production:
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Lint:
+```bash
+npm run lint
+```
 
-## Learn More
+## Project Structure
+```
+app/
+  blog/
+    [slug]/page.tsx     # Single post page (TOC + read time shown)
+    page.tsx            # Blog index: search, tags, pagination
+  layout.tsx            # Theme + PageTransition
+  globals.css           # Global styles, TOC + layout styles
+blog/                   # Markdown posts
+components/
+  AnimatedLink.tsx      # Link with transition pre-nav behavior
+  PageTransition.tsx    # GSAP transition overlay (client-only)
+  TableOfContents.tsx   # Sticky, interactive TOC
+utils/
+  blog.ts               # Markdown parsing, read time, TOC extraction
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Content Authoring (Markdown)
+Create a file in `blog/`, e.g. `my-post.md`:
+```md
+---
+title: "My Post Title"
+date: "2024-10-01"
+description: "Optional short summary"
+tags: "tag1, tag2"
+# readTime: "3 min read"  # optional override
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Main Heading
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Intro paragraph...
 
-## Deploy on Vercel
+## Section One
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Content...
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Section Two
+
+More content...
+```
+
+Notes:
+- Table of contents is auto-generated from headings and requires no manual IDs.
+- Reading time is computed from the raw markdown if `readTime` is not set.
+
+## Configuration
+- `NEXT_PUBLIC_BASE_URL`: Used for absolute post URLs in social sharing. Example:
+```bash
+NEXT_PUBLIC_BASE_URL=https://yourdomain.com
+```
+
+## Performance Details
+- GSAP is dynamically imported on the client in `PageTransition` to avoid SSR issues and reduce initial bundle size.
+- Animated navigation uses a pre-cover event (`AnimatedLink`) and disables Next.js prefetch on animated links to avoid wasted bandwidth.
+- Reduced motion respected via `prefers-reduced-motion` (crossfade).
+
+## Deployment
+This project deploys well to Vercel or any Node-capable host.
+```bash
+npm run build
+npm start
+```
+
+## License
+MIT
