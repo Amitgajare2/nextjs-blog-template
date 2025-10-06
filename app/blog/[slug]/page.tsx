@@ -1,6 +1,7 @@
 import Navigation from '../../../components/Navigation';
 import SocialShare from '../../../components/SocialShare';
-import { getPostData, getAllPostSlugs } from '../../../utils/blog';
+import TableOfContents from '../../../components/TableOfContents';
+import { getPostData, getAllPostSlugs, extractHeadings } from '../../../utils/blog';
 import { notFound } from 'next/navigation';
 
 interface BlogPostPageProps {
@@ -40,37 +41,46 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
   }
 
   const postUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/blog/${post.slug}`;
+  const headings = extractHeadings(post.contentHtml);
 
   return (
     <>
       <Navigation />
       <main className="main">
-        <article className="blog-content">
-          <h1>{post.title}</h1>
-          
-          <div className="blog-post-meta">
-            <span className="blog-post-date">{post.date}</span>
-            {post.readTime && <span>• {post.readTime}</span>}
-          </div>
-          
-          {post.tags && (
-            <div className="blog-post-tags">
-              {post.tags.split(',').map((tag, index) => (
-                <span key={index} className="blog-post-tag">
-                  {tag.trim()}
-                </span>
-              ))}
+        <div className="blog-layout">
+          <article className="blog-content">
+            <h1>{post.title}</h1>
+            
+            <div className="blog-post-meta">
+              <span className="blog-post-date">{post.date}</span>
+              <span>• {post.readTime}</span>
             </div>
+            
+            {post.tags && (
+              <div className="blog-post-tags">
+                {post.tags.split(',').map((tag, index) => (
+                  <span key={index} className="blog-post-tag">
+                    {tag.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
+            
+            <SocialShare 
+              title={post.title}
+              url={postUrl}
+              description={post.description}
+            />
+          </article>
+          
+          {headings.length > 0 && (
+            <aside className="blog-sidebar">
+              <TableOfContents headings={headings} />
+            </aside>
           )}
-          
-          <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-          
-          <SocialShare 
-            title={post.title}
-            url={postUrl}
-            description={post.description}
-          />
-        </article>
+        </div>
       </main>
       
       <footer className="footer">
