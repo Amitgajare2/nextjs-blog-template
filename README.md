@@ -1,4 +1,4 @@
-# Unfiltered Mind — Next.js Blog Template
+# Next.js Blog Template
 
 Modern, fast, and accessible blog template built with Next.js App Router. Ships with animated page transitions, automatic table of contents, and auto-generated reading time.
 
