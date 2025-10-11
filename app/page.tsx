@@ -10,9 +10,9 @@ export default async function Home() {
       <Navigation />
       <main className="main">
         <div className="container">
-          <h1 className="title">Unfiltered Mind</h1>
+          <h1 className="title">Blog Title</h1>
           <p className="subtitle">
-            a political blog that cuts through the noise. No PR talk, no paid narrative - just raw optinions, facts, and fearless satire straight from a common man's mind. here, every post questions the system, mocks the propaganda, and celebrates free thinking.
+           write here blog description 
           </p>
           
           <ul className="blog-posts">
