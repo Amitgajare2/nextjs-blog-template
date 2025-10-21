@@ -20,7 +20,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   try {
-    const post = await getPostData(params.slug);
+    const resolvedParams = await params;
+    const post = await getPostData(resolvedParams.slug);
     return {
       title: post.title,
       description: post.description,
@@ -53,7 +54,8 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
   let post;
   
   try {
-    post = await getPostData(params.slug);
+    const resolvedParams = await params;
+    post = await getPostData(resolvedParams.slug);
   } catch (error) {
     notFound();
   }
