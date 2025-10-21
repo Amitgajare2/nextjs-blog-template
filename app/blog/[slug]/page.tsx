@@ -3,6 +3,7 @@ import SocialShare from '../../../components/SocialShare';
 import TableOfContents from '../../../components/TableOfContents';
 import { getPostData, getAllPostSlugs, extractHeadings } from '../../../utils/blog';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 interface BlogPostPageProps {
   params: {
@@ -17,12 +18,29 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   try {
     const post = await getPostData(params.slug);
     return {
       title: post.title,
       description: post.description,
+      alternates: {
+        canonical: `/blog/${post.slug}`,
+      },
+      openGraph: {
+        type: 'article',
+        title: post.title,
+        description: post.description,
+        url: `/blog/${post.slug}`,
+        publishedTime: new Date(post.date).toISOString(),
+        authors: ['unfilteredmind'],
+        tags: post.tags?.split(',').map((t) => t.trim()),
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.title,
+        description: post.description,
+      },
     };
   } catch (error) {
     return {
@@ -42,6 +60,17 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
 
   const postUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/blog/${post.slug}`;
   const headings = extractHeadings(post.contentHtml);
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    datePublished: new Date(post.date).toISOString(),
+    dateModified: new Date(post.date).toISOString(),
+    description: post.description,
+    url: postUrl,
+    author: { '@type': 'Person', name: 'unfilteredmind' },
+    publisher: { '@type': 'Organization', name: 'unfilteredmind' },
+  };
 
   return (
     <>
@@ -50,6 +79,7 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
         <div className="blog-layout">
           <article className="blog-content">
             <h1>{post.title}</h1>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
             
             <div className="blog-post-meta">
               <span className="blog-post-date">{post.date}</span>
@@ -96,3 +126,4 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
     </>
   );
 }
+
