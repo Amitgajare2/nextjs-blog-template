@@ -21,6 +21,7 @@ export default async function Home() {
                 <AnimatedLink href={`/blog/${post.slug}`} className="blog-post-link">
                   <span className="blog-post-date">{post.date}</span>
                   <span className="blog-post-title">{post.title}</span>
+                  {post.readTime && <span> • {post.readTime}</span>}
                 </AnimatedLink>
               </li>
             ))}
