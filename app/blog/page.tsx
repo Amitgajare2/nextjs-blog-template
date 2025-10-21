@@ -1,4 +1,5 @@
 import Navigation from '../../components/Navigation';
+import type { Metadata } from 'next';
 import SearchBar from '../../components/SearchBar';
 import TagsFilter from '../../components/TagsFilter';
 import Pagination from '../../components/Pagination';
@@ -12,6 +13,20 @@ interface BlogPageProps {
     tag?: string;
   };
 }
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Read the latest posts on unfilteredmind.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'Blog | unfilteredmind',
+    description: 'Read the latest posts on unfilteredmind.',
+    url: '/blog',
+    type: 'website',
+  },
+};
 
 export default async function Blog({ searchParams }: BlogPageProps) {
   const params = await searchParams;
@@ -119,3 +134,4 @@ export default async function Blog({ searchParams }: BlogPageProps) {
     </>
   );
 }
+
