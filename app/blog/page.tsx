@@ -14,9 +14,10 @@ interface BlogPageProps {
 }
 
 export default async function Blog({ searchParams }: BlogPageProps) {
-  const page = parseInt(searchParams.page || '1');
-  const searchQuery = searchParams.search;
-  const tagFilter = searchParams.tag;
+  const params = await searchParams;
+  const page = parseInt(params.page || '1');
+  const searchQuery = params.search;
+  const tagFilter = params.tag;
   
   let postsData;
   let allTags = getAllTags();
