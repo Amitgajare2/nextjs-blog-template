@@ -118,7 +118,7 @@ export async function getPostData(slug: string): Promise<BlogPost> {
       .use(addHeadingIds)
       .use(html)
       .process(matterResult.content);
-    const contentHtml = processedContent.toString();
+    const contentHtml = enhanceImagesInHtml(processedContent.toString());
 
     // Calculate read time if not already provided
     const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
@@ -251,4 +251,36 @@ export function extractHeadings(htmlContent: string): Array<{id: string, text: s
   }
 
   return headings;
+}
+
+// Ensure images are lazy-loaded and have descriptive alt attributes in generated HTML
+function enhanceImagesInHtml(html: string): string {
+  return html.replace(/<img([^>]*)>/gi, (match, attrs) => {
+    let newAttrs = attrs;
+
+    // Add loading="lazy" if missing
+    if (!/\bloading\s*=\s*"?lazy"?/i.test(newAttrs)) {
+      newAttrs += ' loading="lazy"';
+    }
+
+    // Add decoding="async" if missing
+    if (!/\bdecoding\s*=\s*"?async"?/i.test(newAttrs)) {
+      newAttrs += ' decoding="async"';
+    }
+
+    // Ensure alt attribute exists and is non-empty
+    if (!/\balt\s*=\s*"[^"]*"/i.test(newAttrs)) {
+      // Try to derive alt from filename in src
+      const srcMatch = newAttrs.match(/\bsrc\s*=\s*"([^"]+)"/i);
+      let altText = 'Image';
+      if (srcMatch) {
+        const src = srcMatch[1];
+        const filename = src.split('/').pop() || '';
+        altText = filename.replace(/[-_]/g, ' ').replace(/\.[a-z0-9]+$/i, '').trim() || 'Image';
+      }
+      newAttrs += ` alt="${altText}"`;
+    }
+
+    return `<img${newAttrs}>`;
+  });
 }
