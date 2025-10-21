@@ -62,6 +62,19 @@ export default async function Blog({ searchParams }: BlogPageProps) {
       <Navigation />
       <main className="main">
         <div className="container">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                  { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+                  { '@type': 'ListItem', position: 2, name: 'Blog', item: '/blog' },
+                ],
+              }),
+            }}
+          />
           <h1 className="title">My Blog</h1>
           
           <SearchBar />
