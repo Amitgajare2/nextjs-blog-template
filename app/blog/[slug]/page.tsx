@@ -73,6 +73,15 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
     author: { '@type': 'Person', name: 'unfilteredmind' },
     publisher: { '@type': 'Organization', name: 'unfilteredmind' },
   };
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: '/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `/blog/${post.slug}` },
+    ],
+  };
 
   return (
     <>
@@ -82,6 +91,7 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
           <article className="blog-content">
             <h1>{post.title}</h1>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
             
             <div className="blog-post-meta">
               <span className="blog-post-date">{post.date}</span>
