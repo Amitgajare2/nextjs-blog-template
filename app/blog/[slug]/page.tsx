@@ -1,7 +1,10 @@
 import Navigation from '../../../components/Navigation';
 import SocialShare from '../../../components/SocialShare';
 import TableOfContents from '../../../components/TableOfContents';
-import { getPostData, getAllPostSlugs, extractHeadings } from '../../../utils/blog';
+import RelatedPosts from '../../../components/RelatedPosts';
+import AuthorBio from '../../../components/AuthorBio';
+import { getPostData, getAllPostSlugs, extractHeadings, getRelatedPosts } from '../../../utils/blog';
+import { getAuthorData } from '../../../utils/author';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
@@ -22,6 +25,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   try {
     const resolvedParams = await params;
     const post = await getPostData(resolvedParams.slug);
+    const author = getAuthorData();
+    
     return {
       title: post.title,
       description: post.description,
@@ -34,13 +39,14 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         description: post.description,
         url: `/blog/${post.slug}`,
         publishedTime: new Date(post.date).toISOString(),
-        authors: ['unfilteredmind'],
+        authors: [author.name],
         tags: post.tags?.split(',').map((t) => t.trim()),
       },
       twitter: {
         card: 'summary_large_image',
         title: post.title,
         description: post.description,
+        creator: author.social.twitter ? `@${author.social.twitter.split('/').pop()}` : undefined,
       },
     };
   } catch (error) {
@@ -60,8 +66,10 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const author = getAuthorData();
   const postUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/blog/${post.slug}`;
   const headings = extractHeadings(post.contentHtml);
+  const relatedPosts = getRelatedPosts(post.slug, 3);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -70,8 +78,21 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
     dateModified: new Date(post.date).toISOString(),
     description: post.description,
     url: postUrl,
-    author: { '@type': 'Person', name: 'unfilteredmind' },
-    publisher: { '@type': 'Organization', name: 'unfilteredmind' },
+    author: { 
+      '@type': 'Person', 
+      name: author.name,
+      description: author.shortBio,
+      url: author.website,
+      sameAs: Object.values(author.social).filter(url => url),
+      jobTitle: author.credentials.title,
+      worksFor: author.credentials.company,
+      knowsAbout: author.expertise
+    },
+    publisher: { 
+      '@type': 'Organization', 
+      name: author.name,
+      url: author.website
+    },
   };
   const breadcrumbLd = {
     '@context': 'https://schema.org',
@@ -115,6 +136,10 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
               url={postUrl}
               description={post.description}
             />
+            
+            <AuthorBio variant="compact" showSocial={true} showCredentials={false} showExpertise={false} />
+            
+            <RelatedPosts posts={relatedPosts} />
           </article>
           
           {headings.length > 0 && (
