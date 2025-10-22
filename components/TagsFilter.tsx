@@ -22,7 +22,7 @@ export default function TagsFilter({ tags, currentTag, baseUrl }: TagsFilterProp
         {tags.map((tag) => (
           <AnimatedLink
             key={tag}
-            href={`${baseUrl}?tag=${encodeURIComponent(tag)}`}
+            href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`}
             className={`tag ${currentTag === tag ? 'tag-active' : ''}`}
           >
             {tag}
