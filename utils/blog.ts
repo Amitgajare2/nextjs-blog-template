@@ -253,6 +253,47 @@ export function extractHeadings(htmlContent: string): Array<{id: string, text: s
   return headings;
 }
 
+// Get related posts based on shared tags
+export function getRelatedPosts(currentSlug: string, limit: number = 3): BlogPostSummary[] {
+  const allPosts = getPostsSummary();
+  const currentPost = allPosts.find(post => post.slug === currentSlug);
+  
+  if (!currentPost || !currentPost.tags) {
+    // If no tags, return most recent posts excluding current
+    return allPosts
+      .filter(post => post.slug !== currentSlug)
+      .slice(0, limit);
+  }
+
+  const currentTags = currentPost.tags.split(',').map(tag => tag.trim().toLowerCase());
+  
+  // Score posts based on shared tags
+  const scoredPosts = allPosts
+    .filter(post => post.slug !== currentSlug)
+    .map(post => {
+      if (!post.tags) return { post, score: 0 };
+      
+      const postTags = post.tags.split(',').map(tag => tag.trim().toLowerCase());
+      const sharedTags = currentTags.filter(tag => postTags.includes(tag));
+      const score = sharedTags.length;
+      
+      return { post, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  // Return top scored posts, fallback to recent if not enough matches
+  const relatedPosts = scoredPosts.slice(0, limit).map(item => item.post);
+  
+  if (relatedPosts.length < limit) {
+    const recentPosts = allPosts
+      .filter(post => post.slug !== currentSlug && !relatedPosts.some(rp => rp.slug === post.slug))
+      .slice(0, limit - relatedPosts.length);
+    relatedPosts.push(...recentPosts);
+  }
+
+  return relatedPosts;
+}
+
 // Ensure images are lazy-loaded and have descriptive alt attributes in generated HTML
 function enhanceImagesInHtml(html: string): string {
   return html.replace(/<img([^>]*)>/gi, (match, attrs) => {
