@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { getAllPostSlugs } from '../utils/blog';
+import { getAllPostSlugs, getAllTags } from '../utils/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
@@ -17,6 +17,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...postRoutes];
+  const tagRoutes = getAllTags().map((tag) => ({
+    url: `${baseUrl}/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...postRoutes, ...tagRoutes];
 }
 
