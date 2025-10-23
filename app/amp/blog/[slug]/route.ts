@@ -49,9 +49,10 @@ function toAmpHtml(html: string): string {
 
 export async function GET(
   _request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const post = await getPostData(params.slug);
+  const resolvedParams = await params;
+  const post = await getPostData(resolvedParams.slug);
 
   const ampContent = toAmpHtml(post.contentHtml);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
