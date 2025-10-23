@@ -5,9 +5,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface TagPageProps {
-  params: {
+  params: Promise<{
     tag: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
@@ -72,7 +72,7 @@ export default async function TagPage({ params }: TagPageProps) {
             }}
           />
           
-          <h1 className="title">Posts tagged with "{tag}"</h1>
+          <h1 className="title">Posts tagged with &quot;{tag}&quot;</h1>
           <p className="subtitle">{posts.length} post{posts.length !== 1 ? 's' : ''} found</p>
           
           <ul className="blog-posts">
