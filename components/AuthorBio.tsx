@@ -108,7 +108,7 @@ const AuthorBio: React.FC<AuthorBioProps> = ({
   className = ''
 }) => {
   const author = getAuthorData();
-  const socialLinks = Object.entries(author.social).filter(([_, url]) => url);
+  const socialLinks = Object.entries(author.social).filter(([, url]) => url);
 
   return (
     <div className={`author-bio author-bio--${variant} ${className}`}>
