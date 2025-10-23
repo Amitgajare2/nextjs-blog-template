@@ -22,7 +22,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 	useLayoutEffect(() => {
 		if (!overlayRef.current || !contentRef.current) return;
 
-    const startCover = async (_e?: Event) => {
+    const startCover = async () => {
 			if (!overlayRef.current) return;
 			if (preNavAnimatingRef.current) return;
 			preNavAnimatingRef.current = true;
@@ -103,7 +103,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 		return ctx;
     };
 
-    let ctxPromise = init();
+    const ctxPromise = init();
 
     return () => {
         window.removeEventListener("page:cover:start", startCover);
