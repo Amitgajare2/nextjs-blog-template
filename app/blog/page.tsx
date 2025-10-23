@@ -7,11 +7,11 @@ import { getPaginatedPosts, getAllTags, searchPosts, getPostsByTag } from '../..
 import AnimatedLink from '../../components/AnimatedLink';
 
 interface BlogPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
     tag?: string;
-  };
+  }>;
 }
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default async function Blog({ searchParams }: BlogPageProps) {
   const tagFilter = params.tag;
   
   let postsData;
-  let allTags = getAllTags();
+  const allTags = getAllTags();
   
   if (searchQuery) {
     const searchResults = searchPosts(searchQuery);
@@ -82,13 +82,13 @@ export default async function Blog({ searchParams }: BlogPageProps) {
           
           {searchQuery && (
             <div className="search-results-info">
-              <p>Search results for "{searchQuery}" ({postsData.totalPosts} posts found)</p>
+              <p>Search results for &quot;{searchQuery}&quot; ({postsData.totalPosts} posts found)</p>
             </div>
           )}
           
           {tagFilter && (
             <div className="tag-results-info">
-              <p>Posts tagged with "{tagFilter}" ({postsData.totalPosts} posts found)</p>
+              <p>Posts tagged with &quot;{tagFilter}&quot; ({postsData.totalPosts} posts found)</p>
             </div>
           )}
           
