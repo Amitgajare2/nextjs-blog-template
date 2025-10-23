@@ -32,8 +32,17 @@ export default function AnimatedLink({ children, className, onClick, href, ...re
 			if (typeof href === "string") {
 				router.push(href);
 			} else {
-				// For UrlObject
-				router.push(href as any);
+				// For UrlObject, convert to string
+				const pathname = href.pathname || '/';
+				const url = new URL(pathname, window.location.origin);
+				if (href.query) {
+					Object.entries(href.query).forEach(([key, value]) => {
+						if (value !== undefined && value !== null) {
+							url.searchParams.set(key, String(value));
+						}
+					});
+				}
+				router.push(url.pathname + url.search);
 			}
 		}, 50);
 	};
