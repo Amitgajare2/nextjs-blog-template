@@ -16,13 +16,13 @@ const page = () => {
               Welcome to Unfiltered Mind - the digital echo of frustration, logic, and rebellion.
             </p>
             <p>
-              This is where i write what TRP-hungry media won't, and what politicians fear the most - truth served without filter.
+              This is where i write what TRP-hungry media won&apos;t, and what politicians fear the most - truth served without filter.
             </p>
             <p>
               No party lines, no propaganda, just reality, sarcasm, and a voice that refuses to be silenced.
             </p>
             <p>
-              Because democracy isn't about silence - it's about saying what they don't want to hear.
+              Because democracy isn&apos;t about silence - it&apos;s about saying what they don&apos;t want to hear.
             </p>
           </div>
           
