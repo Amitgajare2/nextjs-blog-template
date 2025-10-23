@@ -9,9 +9,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         creator: author.social.twitter ? `@${author.social.twitter.split('/').pop()}` : undefined,
       },
     };
-  } catch (error) {
+  } catch {
     return {
       title: 'Post Not Found',
     };
@@ -62,7 +62,7 @@ export default async function BlogPost({ params }: BlogPostPageProps) {
   try {
     const resolvedParams = await params;
     post = await getPostData(resolvedParams.slug);
-  } catch (error) {
+  } catch {
     notFound();
   }
 
